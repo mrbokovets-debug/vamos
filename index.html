@@ -21,7 +21,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 </head>
 <body>
 <div class="app">
-<header><div class="brand"><div class="logo">¡V!</div><div><h1>¡Vamos!</h1><small>Испанский по 5 минут в день</small></div></div><div class="streak">🔥 <span id="streak">1</span></div></header>
+<header><div class="brand"><div class="logo">¡V!</div><div><h1>¡Vamos!</h1><small>Испанский по 5 минут в день</small></div></div><div class="streak">🔥 <span id="streak">0</span></div></header>
 <section class="hero"><div class="eyebrow" id="dayLabel">ТВОЙ УРОК</div><h2>Немного каждый день.<br>Говори увереннее.</h2><p>5 коротких фраз для жизни и работы в Испании.</p><div class="progress-line"><span id="heroProgress"></span></div></section>
 <div class="stats"><div class="stat"><strong id="learned">0</strong><span>ответов сегодня</span></div><div class="stat"><strong id="points">0</strong><span>очков</span></div><div class="stat"><strong id="total">0</strong><span>дней занятий</span></div></div>
 <section class="panel" id="quiz">
@@ -31,46 +31,48 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 <div class="tools"><button id="speak">🔊 Послушать</button><button id="hint">💡 Подсказка</button></div>
 <button class="btn" id="next" disabled>Проверить ответ</button>
 </section>
-<section class="panel hidden" id="done"><div class="result"><div class="emoji">🏆</div><h2>Урок завершён!</h2><p id="resultText">Ты сделал это!</p><p>Завтра откроются 5 новых фраз. Старые будут иногда возвращаться для повторения.</p><button class="btn" id="review">Повторить урок</button><button class="btn secondary" id="newDay">Посмотреть следующий урок</button></div></section>
+<section class="panel hidden" id="done"><div class="result"><div class="emoji">🏆</div><h2>Урок завершён!</h2><p id="resultText">Ты сделал это!</p><p id="nextInfo">Завтра появятся 5 новых фраз.</p><button class="btn" id="review">Повторить урок</button><button class="btn secondary" id="newDay">Посмотреть следующий урок</button></div></section>
 <h3 class="section-title">🎯 Совет дня</h3><div class="tip" id="tip">На работе попробуй произнести хотя бы одну фразу вслух. Ошибаться — нормально: так ты учишься.</div>
 <div class="foot">¡Vamos! — твой маленький тренажёр испанского 🇪🇸</div>
 </div>
 <script>
-const lessons = [
-[
-{es:"Estoy aquí",ru:"Я здесь",pron:"эстОй акИ",hint:"Ты уже приехал и сообщаешь, что находишься на месте."},
-{es:"Estoy esperando",ru:"Я жду",pron:"эстОй эсперАндо",hint:"Полезно в ресторане, когда заказ ещё не готов."},
-{es:"No entiendo",ru:"Я не понимаю",pron:"но энтьЕндо",hint:"Скажи это, если собеседник говорит слишком быстро."},
-{es:"Ya voy",ru:"Уже еду / уже иду",pron:"я вой",hint:"Короткий ответ, когда ты уже направляешься к человеку."},
-{es:"Un momento",ru:"Одну минуту",pron:"ун момЭнто",hint:"Вежливая просьба немного подождать."}
-],
-[
-{es:"Tengo hambre",ru:"Я голоден",pron:"тЭнго Амбре",hint:"Когда хочется поесть."},
-{es:"Tengo prisa",ru:"Я спешу",pron:"тЭнго прИса",hint:"Когда нужно торопиться."},
-{es:"¿Cuánto cuesta?",ru:"Сколько это стоит?",pron:"куАнто куЭста",hint:"Вопрос о цене."},
-{es:"Está cerrado",ru:"Закрыто",pron:"эстА серрАдо",hint:"Так говорят о магазине или заведении."},
-{es:"Muchas gracias",ru:"Большое спасибо",pron:"мУчас грАсьяс",hint:"Вежливо поблагодарить."}
-],
-[
-{es:"¿Está listo?",ru:"Уже готово?",pron:"эстА лИсто",hint:"Спроси в ресторане, готов ли заказ."},
-{es:"Tengo un pedido",ru:"У меня заказ",pron:"тЭнго ун педИдо",hint:"Полезно при получении заказа."},
-{es:"¿Dónde está la entrada?",ru:"Где вход?",pron:"дОнде эстА ла энтрАда",hint:"Когда ищешь вход в здание."},
-{es:"Ahora mismo",ru:"Прямо сейчас",pron:"аОра мИсмо",hint:"Значит — именно сейчас."},
-{es:"No pasa nada",ru:"Ничего страшного",pron:"но пАса нАда",hint:"Успокаивающий ответ: всё нормально."}
-]
-];
-const todayKey = new Date().toISOString().slice(0,10);
+const FALLBACK={"lessons":[{"day":1,"tip":"Ошибаться — нормально: так ты учишься.","cards":[
+{"es":"Estoy aquí","ru":"Я здесь","pron":"эстОй акИ","hint":"Ты уже приехал и сообщаешь, что находишься на месте."},
+{"es":"Estoy esperando","ru":"Я жду","pron":"эстОй эсперАндо","hint":"Полезно в ресторане, когда заказ ещё не готов."},
+{"es":"No entiendo","ru":"Я не понимаю","pron":"но энтьЕндо","hint":"Скажи это, если собеседник говорит слишком быстро."},
+{"es":"Ya voy","ru":"Уже еду / уже иду","pron":"я вой","hint":"Короткий ответ, когда ты уже направляешься к человеку."},
+{"es":"Un momento","ru":"Одну минуту","pron":"ун момЭнто","hint":"Вежливая просьба немного подождать."}]}]};
+const $=id=>document.getElementById(id);
 function load(){try{return JSON.parse(localStorage.getItem("vamos-progress")||"{}")||{}}catch(e){return {}}}
 function store(d){try{localStorage.setItem("vamos-progress",JSON.stringify(d))}catch(e){}}
-const saved = load();
-let lessonIndex = Math.min(saved.lessonIndex||0, lessons.length-1);
-let cards = lessons[lessonIndex];
-let order = [...cards.keys()];
-let idx=0, selected=null, checked=false, score=0, correct=0;
-const $=id=>document.getElementById(id);
-$("dayLabel").textContent="ДЕНЬ "+(lessonIndex+1)+" · УРОК";
-$("total").textContent=saved.days||0;$("points").textContent=saved.points||0;$("streak").textContent=saved.streak||1;
-function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function dayKey(d){const x=d||new Date();return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+const todayKey=dayKey();
+const yesterdayKey=dayKey(new Date(Date.now()-864e5));
+const saved=load();
+let lessons=[],lessonIndex=0,cards=[],order=[],idx=0,selected=null,checked=false,score=0,correct=0;
+
+async function start(){
+ let data=FALLBACK;
+ try{const r=await fetch("lessons.json?t="+Date.now(),{cache:"no-store"});if(r.ok)data=await r.json()}catch(e){}
+ lessons=data.lessons.filter(l=>l.cards&&l.cards.length);
+ lessonIndex=Math.min(saved.lessonIndex||0,lessons.length-1);
+ // новый день: если вчерашний урок пройден и есть следующий — открываем его
+ if(saved.completed===lessonIndex&&saved.lastDate!==todayKey&&lessonIndex<lessons.length-1){lessonIndex++;saved.lessonIndex=lessonIndex;store(saved)}
+ const streak=(saved.lastDate===todayKey||saved.lastDate===yesterdayKey)?(saved.streak||1):(saved.lastDate?0:0);
+ $("streak").textContent=streak;
+ $("total").textContent=saved.days||0;$("points").textContent=saved.points||0;
+ openLesson();
+}
+function openLesson(){
+ const L=lessons[lessonIndex];cards=L.cards;order=shuffle([...cards.keys()]);
+ idx=0;score=0;correct=0;
+ $("dayLabel").textContent="УРОК "+(lessonIndex+1)+" ИЗ "+lessons.length;
+ if(L.tip)$("tip").textContent=L.tip;
+ $("done").classList.add("hidden");$("quiz").classList.remove("hidden");
+ if(saved.completed===lessonIndex&&saved.lastDate===todayKey){showDone(true);return}
+ render();
+}
 function render(){
  if(idx>=cards.length){finish();return}
  selected=null;checked=false;
@@ -81,10 +83,10 @@ function render(){
  $("question").textContent=reverse?c.ru:c.es;
  $("pron").textContent="Произношение: "+c.pron;
  $("feedback").className="feedback hidden";$("feedback").textContent="";
- $("next").disabled=true;$("next").textContent="Проверить ответ";
+ $("next").disabled=true;$("next").textContent="Проверить ответ";$("next").onclick=null;
  const correctAnswer=reverse?c.es:c.ru;
- const all=lessons.flat().map(x=>reverse?x.es:x.ru);
- const distractors=shuffle([...new Set(all.filter(x=>x!==correctAnswer))]).slice(0,2);
+ const pool=lessons.slice(0,lessonIndex+3).flatMap(l=>l.cards).map(x=>reverse?x.es:x.ru);
+ const distractors=shuffle([...new Set(pool.filter(x=>x!==correctAnswer))]).slice(0,2);
  const opts=shuffle([correctAnswer,...distractors]);
  $("choices").innerHTML="";
  opts.forEach(opt=>{const b=document.createElement("button");b.className="choice";b.textContent=opt;b.onclick=()=>choose(b,opt,correctAnswer,c);$("choices").appendChild(b)});
@@ -93,7 +95,7 @@ function render(){
 }
 function choose(btn,opt,correctAnswer,c){
  if(checked)return;
- selected=opt;document.querySelectorAll(".choice").forEach(b=>{b.classList.remove("selected");b.style.borderColor="#dce6df"});
+ document.querySelectorAll(".choice").forEach(b=>b.style.borderColor="#dce6df");
  btn.style.borderColor="#176b4d";selected=opt;$("next").disabled=false;$("next").textContent="Ответить";
  $("next").onclick=()=>check(correctAnswer,c);
 }
@@ -108,20 +110,27 @@ function check(correctAnswer,c){
  $("heroProgress").style.width=((idx+1)/cards.length*100)+"%";
 }
 function finish(){
- $("quiz").classList.add("hidden");$("done").classList.remove("hidden");
+ const first=saved.lastDate!==todayKey;
+ if(first){saved.streak=(saved.lastDate===yesterdayKey?(saved.streak||0)+1:1);saved.days=(saved.days||0)+1}
+ saved.points=(saved.points||0)+score;saved.lastDate=todayKey;saved.completed=lessonIndex;saved.lessonIndex=lessonIndex;
+ store(saved);
+ $("streak").textContent=saved.streak;$("total").textContent=saved.days;$("points").textContent=saved.points;
  $("resultText").textContent=`Правильных ответов: ${correct} из ${cards.length}. Ты заработал ${score} очков!`;
- $("learned").textContent=cards.length;
- const wasToday=saved.lastDate===todayKey;
- const data={...saved,points:(saved.points||0)+score,days:(saved.days||0)+(wasToday?0:1),lastDate:todayKey,lessonIndex:lessonIndex};
- Object.assign(saved,data);store(saved);
- $("total").textContent=data.days;$("points").textContent=data.points;
- $("heroProgress").style.width="100%";
+ showDone(false);
 }
-$("speak").onclick=()=>{const c=cards[order[idx]||0];if(!c)return;if("speechSynthesis"in window){const u=new SpeechSynthesisUtterance(c.es);u.lang="es-ES";u.rate=.82;speechSynthesis.speak(u)}else alert("Озвучивание не поддерживается в этом браузере.")};
-$("hint").onclick=()=>{const c=cards[order[idx]||0];if(c)alert("Подсказка: "+c.hint)};
-$("review").onclick=()=>{idx=0;score=0;correct=0;$("done").classList.add("hidden");$("quiz").classList.remove("hidden");render()};
-$("newDay").onclick=()=>{if(lessonIndex<lessons.length-1){lessonIndex++;saved.lessonIndex=lessonIndex;store(saved);location.reload()}else alert("В демоверсии пока 3 набора уроков. Можно добавить новые фразы в следующей версии!")};
-render();
+function showDone(already){
+ $("quiz").classList.add("hidden");$("done").classList.remove("hidden");
+ if(already)$("resultText").textContent="Сегодняшний урок уже пройден. Можно повторить его ещё раз.";
+ $("learned").textContent=cards.length;$("heroProgress").style.width="100%";
+ const hasNext=lessonIndex<lessons.length-1;
+ $("nextInfo").textContent=hasNext?"Следующий урок уже готов — можно открыть его сейчас.":"Завтра появятся 5 новых фраз.";
+ $("newDay").classList.toggle("hidden",!hasNext);
+}
+$("speak").onclick=()=>{const c=cards[order[idx]];if(!c)return;if("speechSynthesis"in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(c.es);u.lang="es-ES";u.rate=.82;speechSynthesis.speak(u)}else alert("Озвучивание не поддерживается в этом браузере.")};
+$("hint").onclick=()=>{const c=cards[order[idx]];if(c)alert("Подсказка: "+c.hint)};
+$("review").onclick=()=>{idx=0;score=0;correct=0;order=shuffle([...cards.keys()]);$("done").classList.add("hidden");$("quiz").classList.remove("hidden");render()};
+$("newDay").onclick=()=>{if(lessonIndex<lessons.length-1){lessonIndex++;saved.lessonIndex=lessonIndex;store(saved);openLesson();window.scrollTo(0,0)}};
+start();
 if("serviceWorker"in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body></html>
