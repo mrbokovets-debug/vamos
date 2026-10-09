@@ -1,0 +1,10 @@
+{
+  "name": "¡Vamos! — Испанский каждый день",
+  "short_name": "¡Vamos!",
+  "lang": "ru",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f8f5",
+  "theme_color": "#176b4d",
+  "description": "Учите испанский по пять фраз в день."
+}
