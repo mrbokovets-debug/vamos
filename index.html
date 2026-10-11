@@ -32,7 +32,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:20p
 <div class="tools"><button id="speak">🔊 Послушать</button><button id="hint">💡 Подсказка</button></div>
 <button class="btn" id="next" disabled>Проверить ответ</button>
 </section>
-<section class="panel hidden" id="done"><div class="result"><div class="emoji">🏆</div><h2 id="doneTitle">Урок завершён!</h2><p id="resultText">Ты сделал это!</p><p id="nextInfo">Завтра появятся 5 новых фраз.</p><button class="btn" id="review">Повторить урок</button><button class="btn secondary" id="newDay">Посмотреть следующий урок</button></div></section>
+<section class="panel hidden" id="done"><div class="result"><div class="emoji">🏆</div><h2 id="doneTitle">Урок завершён!</h2><p id="resultText">Ты сделал это!</p><p id="nextInfo">Новые фразы появляются через день.</p><button class="btn" id="review">Повторить урок</button><button class="btn secondary" id="newDay">Посмотреть следующий урок</button></div></section>
 <section class="panel hidden" id="list"><div class="topline" style="margin-bottom:12px"><span id="listCount">ВСЕ ФРАЗЫ</span></div><div class="words" id="words"></div></section>
 <h3 class="section-title">🎯 Совет дня</h3><div class="tip" id="tip">На работе попробуй произнести хотя бы одну фразу вслух. Ошибаться — нормально: так ты учишься.</div>
 <div class="foot">¡Vamos! — твой маленький тренажёр испанского 🇪🇸</div>
@@ -148,10 +148,9 @@ function check(correctAnswer,c){
  $("heroProgress").style.width=((idx+1)/cards.length*100)+"%";
 }
 function finish(){
- if(mode==="lesson"){
-  if(saved.lastDate!==todayKey){saved.streak=(saved.lastDate===yesterdayKey?(saved.streak||0)+1:1);saved.days=(saved.days||0)+1}
-  saved.lastDate=todayKey;saved.completed=lessonIndex;saved.lessonIndex=lessonIndex;
- }
+ if(saved.lastDate!==todayKey){saved.streak=(saved.lastDate===yesterdayKey?(saved.streak||0)+1:1);saved.days=(saved.days||0)+1}
+ saved.lastDate=todayKey;
+ if(mode==="lesson"){saved.completed=lessonIndex;saved.lessonIndex=lessonIndex;}
  saved.points=(saved.points||0)+score;store(saved);
  $("streak").textContent=saved.streak||0;$("total").textContent=saved.days||0;$("points").textContent=saved.points;
  $("resultText").textContent=`Правильных ответов: ${correct} из ${cards.length}. Ты заработал ${score} очков!`;
@@ -168,8 +167,15 @@ function showDone(already){
  $("doneTitle").textContent="Урок завершён!";$("review").textContent="Повторить урок";
  if(already)$("resultText").textContent="Сегодняшний урок уже пройден. Можно повторить его или заняться повторением.";
  const hasNext=lessonIndex<lessons.length-1;
- $("nextInfo").textContent=hasNext?"Следующий урок уже готов — можно открыть его сейчас.":"Завтра появятся 5 новых фраз.";
+ $("nextInfo").textContent=hasNext?"Следующий урок уже готов — можно открыть его сейчас.":nextLessonText();
  $("newDay").classList.toggle("hidden",!hasNext);
+}
+function nextLessonText(){
+ const last=lessons[lessons.length-1];
+ if(!last||!last.date)return "Новые 5 фраз появляются через день. А пока — загляни в «Повтор».";
+ const d=new Date(last.date+"T12:00:00");d.setDate(d.getDate()+2);
+ const when=dayKey(d)===dayKey(new Date(Date.now()+864e5))?"завтра":d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"});
+ return "Следующие 5 фраз появятся "+when+". А пока — загляни в «Повтор».";
 }
 function say(text){if("speechSynthesis"in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="es-ES";u.rate=.82;speechSynthesis.speak(u)}else alert("Озвучивание не поддерживается в этом браузере.")}
 $("speak").onclick=()=>{const c=cards[idx];if(c)say(c.es)};
